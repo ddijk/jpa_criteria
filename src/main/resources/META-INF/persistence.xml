@@ -4,7 +4,59 @@
     <persistence-unit name="myPU2" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <!-- external jar should be in src/main/resources -->
+        <class>nl.bytesoflife.clienten.news.NewsMessage</class>
+        <class>nl.bytesoflife.clienten.service.accountview.finance.FinancialData</class>
+        <class>nl.bytesoflife.clienten.service.accountview.declaration.DeclarationsData</class>
+        <class>nl.bytesoflife.clienten.monitoring.Printer</class>
+        <class>nl.bytesoflife.clienten.data.ChangeRequest</class>
+        <class>nl.bytesoflife.clienten.data.TaskUren</class>
+        <class>nl.bytesoflife.clienten.data.UrenExport</class>
+        <class>nl.bytesoflife.clienten.data.AppUserSettings</class>
+        <class>nl.bytesoflife.clienten.data.Nota</class>
+        <class>nl.bytesoflife.clienten.data.Case</class>
+        <class>nl.bytesoflife.clienten.data.Rappel</class>
+        <class>nl.bytesoflife.clienten.data.TaskDetails</class>
+        <class>nl.bytesoflife.clienten.data.Werkcode</class>
+        <class>nl.bytesoflife.clienten.data.ClientContactDetails</class>
+        <class>nl.bytesoflife.clienten.data.AppUser</class>
+        <class>nl.bytesoflife.clienten.data.UrenDefaultRequest</class>
+        <class>nl.bytesoflife.clienten.data.UrenDefault</class>
+        <class>nl.bytesoflife.clienten.data.NotaDtbkOmschrijving</class>
+        <class>nl.bytesoflife.clienten.data.UserRemark</class>
+        <class>nl.bytesoflife.clienten.data.ValueWithType</class>
+        <class>nl.bytesoflife.clienten.data.ClientContactValueWithType</class>
+        <class>nl.bytesoflife.clienten.data.SaveFile</class>
+        <class>nl.bytesoflife.clienten.data.MailSettings</class>
+        <class>nl.bytesoflife.clienten.data.CaseArchiveCheck</class>
+        <class>nl.bytesoflife.clienten.data.SendEmail</class>
+        <class>nl.bytesoflife.clienten.data.AccountviewWerkcodeItem</class>
+        <class>nl.bytesoflife.clienten.data.AccountviewDocFacReference</class>
+        <class>nl.bytesoflife.clienten.data.Validation</class>
+        <class>nl.bytesoflife.clienten.data.SaveEmail</class>
+        <class>nl.bytesoflife.clienten.data.AccountviewContact</class>
+        <class>nl.bytesoflife.clienten.data.ProjectUpdateBuffer</class>
+        <class>nl.bytesoflife.clienten.data.MailSavedInfo</class>
+        <class>nl.bytesoflife.clienten.data.UrenRegel</class>
+        <class>nl.bytesoflife.clienten.data.UserGroup</class>
+        <class>nl.bytesoflife.clienten.data.ChatDetails</class>
+        <class>nl.bytesoflife.clienten.data.SendOptionUren</class>
+        <class>nl.bytesoflife.clienten.data.AddressBook</class>
+        <class>nl.bytesoflife.clienten.data.SaveOptions</class>
+        <class>nl.bytesoflife.clienten.data.AppUserLogin</class>
         <class>nl.bytesoflife.clienten.data.AccountviewProject</class>
+        <class>nl.bytesoflife.clienten.data.ApplicationSetting</class>
+        <class>nl.bytesoflife.clienten.data.Attachment</class>
+        <class>nl.bytesoflife.clienten.data.ChatLine</class>
+        <class>nl.bytesoflife.clienten.data.SaveOptionsTemplate</class>
+        <class>nl.bytesoflife.clienten.data.NotaDebiteurNummer</class>
+        <class>nl.bytesoflife.clienten.data.ChatUserDetails</class>
+        <class>nl.bytesoflife.clienten.data.ProjectBuffer</class>
+        <class>nl.bytesoflife.clienten.data.AccountviewMedewerker</class>
+        <class>nl.bytesoflife.clienten.data.MailMessage</class>
+        <class>nl.bytesoflife.clienten.data.Folder</class>
+        <class>nl.bytesoflife.clienten.taskplanner.data.JobRun</class>
+        <class>nl.bytesoflife.clienten.taskplanner.data.Job</class>
+        <class>nl.bytesoflife.clienten.taskplanner.data.JobType</class>
         <properties>
             <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/advobot_test"/>
             <property name="javax.persistence.jdbc.password" value="advobot_test"/>
