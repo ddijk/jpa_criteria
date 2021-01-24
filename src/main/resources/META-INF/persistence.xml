@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+ 
+    <persistence-unit name="myPU2" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <!-- external jar should be in src/main/resources -->
+        <class>nl.bytesoflife.clienten.data.AccountviewProject</class>
+        <properties>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/advobot_test"/>
+            <property name="javax.persistence.jdbc.password" value="advobot_test"/>
+            <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+            <property name="javax.persistence.jdbc.user" value="advobot_test"/>
+<!--            <property name="eclipselink.ddl-generation" value="none"/>-->
+<!--            <property name="eclipselink.logging.level" value="FINEST"/>-->
+<!--            <property name="eclipselink.logging.level.sql" value="FINE"/>-->
+<!--            <property name="eclipselink.logging.file" value="eclipselink.log"/>-->
+<!--            <property name="hibernate.physical_naming_strategy" value="org.hibernate.cfg.ImprovedNamingStrategy"/>-->
+        </properties>
+    </persistence-unit>
+</persistence>
