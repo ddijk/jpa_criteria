@@ -6,6 +6,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 public class JPARunner {
 
@@ -17,11 +20,18 @@ public class JPARunner {
             emf = Persistence.createEntityManagerFactory("myPU2");
             em = emf.createEntityManager();
 
-            final TypedQuery<AccountviewProject> query = em.createQuery("select p from AccountviewProject  p", AccountviewProject.class);
+            CriteriaBuilder cb = emf.getCriteriaBuilder();
 
-            int n = query.getResultList().size();
+            final CriteriaQuery<AccountviewProject> query = cb.createQuery(AccountviewProject.class);
+            final Root<AccountviewProject> ap = query.from(AccountviewProject.class);
 
-            System.out.println("Aantal projects is " + n);
+
+//            final CriteriaQuery<AccountviewProject> select = query.select(AccountviewProject_.);
+
+            final TypedQuery<AccountviewProject> accountviewProjectTypedQuery = em.createQuery(query);
+
+
+            System.out.println("Aantal projects is " + accountviewProjectTypedQuery.getResultList().size());
 
         } finally {
             if ( em != null) {
