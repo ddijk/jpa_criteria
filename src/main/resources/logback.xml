@@ -1,0 +1,46 @@
+<configuration>
+    <property name="LOG_FOLDER" value="./"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>${LOG_FOLDER}/log/logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
+
+            <!-- keep 30 days' worth of history -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter" level="error" />
+    <!--<logger name="org.springframework.web.socket.config.WebSocketMessageBrokerStats" level="error" />-->
+
+<!--    <logger name="nl.bytesoflife.clienten" level="error" additivity="false">-->
+<!--        <appender-ref ref="FILE" />-->
+<!--        <appender-ref ref="STDOUT" />-->
+<!--    </logger>-->
+
+<!--    <logger name="nl.bytesoflife.clienten.service.problemreport" level="info" additivity="false">-->
+<!--        <appender-ref ref="STDOUT" />-->
+<!--    </logger>-->
+
+    <logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
+<!--        <appender-ref ref="FILE" />-->
+        <appender-ref ref="STDOUT" />
+    </logger>
+
+    <root level="INFO">
+<!--        <appender-ref ref="FILE" />-->
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>
+
