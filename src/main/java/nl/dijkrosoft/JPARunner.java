@@ -23,13 +23,118 @@ public class JPARunner {
             em = emf.createEntityManager();
 
             CriteriaBuilder cb = em.getCriteriaBuilder();
-            testQueryForProjects(em, cb);
+            testCaseListRefactoring(em, cb);
 
         } finally {
-            if (em != null) {
+            if (em != null)
+            {
                 em.close();
             }
             if (emf != null) emf.close();
+        }
+    }
+
+    private static void testCaseListRefactoring(EntityManager em, CriteriaBuilder cb) {
+
+        final CriteriaQuery<Tuple> tupleQuery = cb.createTupleQuery();
+        final Root<Case> root = tupleQuery.from(Case.class);
+
+        Join<Case, AccountviewProject> projectJoin = root.join("accountviewProject");
+        Join<Case, Folder> folderJoin = root.join("folder");
+        Join<Case, ClientContactDetails> clientJoin = root.join("client");
+//        Join<Case, ClientContactDetails> contactClientJoin = root.join("contactClient");
+//        Join<Case, ClientContactDetails> otherClientsJoin = root.join("otherClients");
+//        Join<CaseArchiveCheck, Folder> archiveCheckJoin = root.join("caseArchiveCheck");
+        tupleQuery.multiselect(
+                root.get("name").alias("name"),
+                root.get("dossiernummer").alias("dossiernummer"),
+                root.get("leadnummer").alias("leadnummer"),
+                root.get("bijzondereStatus").alias("bijzondereStatus"),
+                root.get("datumToedracht").alias("datumToedracht"),
+//                root.get("unreadCount").alias("unreadCount"),
+//                root.get("debtorBalanceAcountView").alias("saldoAV"),
+//                root.get("debtorBalance").alias("saldo"),
+
+                folderJoin.get("name").alias("folderName"),
+
+                clientJoin.get("huisnummer").alias("huisnummer"),
+                clientJoin.get("straatnaam").alias("straatnaam")
+//                clientJoin.get("toevoeging").alias("toevoeging"),
+//                clientJoin.get("postcode").alias("postcode"),
+//                clientJoin.get("woonplaats").alias("woonplaats"),
+//                clientJoin.get("defaultContact" ).alias("defaultContact"),
+//                clientJoin.get("geslacht" ).alias("geslacht"),
+//                clientJoin.get("naam" ).alias("mainContactNaam"),
+//                clientJoin.get("email" ).alias("mainContactEmail"),
+//                clientJoin.get("telefoon" ).alias("mainContactTelefoon"),
+
+//                contactClientJoin.get("email").alias("contactClientEmail"),
+//
+//                // tpa
+//                root.get("lastPaymentDate").alias("tpaLastPaymentDate"),
+//                otherClientsJoin.get("naam").alias("tpaNaam"),
+//                otherClientsJoin.get("defaultContact").alias("tpaDefaultContact"),
+//                otherClientsJoin.get("email").alias("tpaEmail"), // multie val
+//                otherClientsJoin.get("instantie").alias("tpaInstantie"),
+//                otherClientsJoin.get("postbus").alias("tpaPostbus"),
+//                otherClientsJoin.get("postcodePostbus").alias("tpaPostcodePostbus"),
+//                otherClientsJoin.get("plaatsnaamPostbus").alias("tpaPlaatsnaamPostbus"),
+//                otherClientsJoin.get("telefoon").alias("tpaTelefoon"),  // multi val
+
+//                projectJoin.get("BLOK").alias("blok"),
+
+//                archiveCheckJoin.get("praktijkhoofdCheckedDate").alias("praktijkhoofdCheckedDate"),
+//                archiveCheckJoin.get("needsPraktijkhoofdChecked").alias("needsPraktijkhoofdChecked")
+//                folderJoin.get("accountviewCompany").alias("company")
+
+        );
+
+        Predicate whereClause = getPred(cb, root.get("folder").get("id"), selectedPraktijken, authPraktijken);
+        final String searchTerm = "";// filterz.getName();
+        if (searchTerm != null && searchTerm.length() > 0) {
+//            .info(String.format("Searchterm '%s'", searchTerm));
+            final String likeSearchTerm = String.format("%%%s%%", searchTerm);
+            final Predicate searchTermPredicate = cb.or(
+                    cb.like(root.get("dossiernummer"), likeSearchTerm));
+
+            whereClause = cb.and(whereClause, searchTermPredicate);
+        }
+
+        tupleQuery.where(whereClause);
+
+//        if (sortableColumns.contains(sort)) {
+//
+//            if ( sort.indexOf(":") == -1) {
+//                if ("ASC".equalsIgnoreCase(direction)) {
+//
+//                    tupleQuery.orderBy(cb.asc(projectJoin.get(sort)));
+//                } else {
+//                    tupleQuery.orderBy(cb.desc(projectJoin.get(sort)));
+//
+//                }
+//            } else {
+//                if ("ASC".equalsIgnoreCase(direction)) {
+//
+//                    tupleQuery.orderBy(cb.asc(root.get(sort.split(":", 2)[1])));
+//                } else {
+//                    tupleQuery.orderBy(cb.desc(root.get(sort.split(":", 2)[1])));
+//
+//                }
+//            }
+//
+//        }
+
+        int pageSize = 20;
+        final TypedQuery<Tuple> emQuery = em.createQuery(tupleQuery);
+        emQuery.setMaxResults(pageSize);
+        emQuery.setFirstResult(0);
+
+
+        List<Tuple> result = emQuery.getResultList();
+
+        System.out.println("Aantal: "+ result.size());
+        for ( Tuple t : result) {
+            System.out.println("dossiernummer:"+t.get("dossiernummer"));
         }
     }
 
