@@ -25,6 +25,9 @@ public class JPARunner {
             CriteriaBuilder cb = em.getCriteriaBuilder();
             testCaseListRefactoring(em, cb);
 
+//            listJoin(em, cb);
+
+
         } finally {
             if (em != null)
             {
@@ -34,18 +37,45 @@ public class JPARunner {
         }
     }
 
+    private static void listJoin(EntityManager em, CriteriaBuilder cb) {
+        final CriteriaQuery<Tuple> tupleQuery = cb.createTupleQuery();
+
+        final Root<Case> caseRoot = tupleQuery.from(Case.class);
+        Join<Case, ClientContactDetails> clientJoin = caseRoot.join(Case_.client);
+        ListJoin<ClientContactDetails, ClientContactValueWithType> emailJoin = clientJoin.join(ClientContactDetails_.email);
+
+
+        tupleQuery.where(cb.equal(caseRoot.get(Case_.id), 11823));
+
+        tupleQuery.multiselect(
+                caseRoot.get(Case_.name).alias("naam"),
+                emailJoin.get(ClientContactValueWithType_.value).alias("email")
+                );
+
+        final List<Tuple> resultList = em.createQuery(tupleQuery).getResultList();
+        System.out.println("Aantal " + resultList.size());
+        for ( Tuple t : resultList) {
+            System.out.println(String.format("Case Naam is '%s', email='%s' " , t.get("naam"), t.get("email")));
+        }
+    }
+
     private static void testCaseListRefactoring(EntityManager em, CriteriaBuilder cb) {
 
         final CriteriaQuery<Tuple> tupleQuery = cb.createTupleQuery();
         final Root<Case> root = tupleQuery.from(Case.class);
 
-        Join<Case, AccountviewProject> projectJoin = root.join("accountviewProject");
-        Join<Case, Folder> folderJoin = root.join("folder");
-        Join<Case, ClientContactDetails> clientJoin = root.join("client");
+        Join<Case, AccountviewProject> projectJoin = root.join(Case_.accountviewProject);
+        Join<Case, Folder> folderJoin = root.join(Case_.folder);
+        Join<Case, ClientContactDetails> clientJoin = root.join(Case_.client);
+
+        //  final Join<ClientContactDetails, ClientContactValueWithType> telefoonJoin =
+        final ListJoin<ClientContactDetails, ClientContactValueWithType> emailJoin = clientJoin.join(ClientContactDetails_.email);
+        final ListJoin<ClientContactDetails, ClientContactValueWithType> telefoonJoin = clientJoin.join(ClientContactDetails_.telefoon);
 //        Join<Case, ClientContactDetails> contactClientJoin = root.join("contactClient");
 //        Join<Case, ClientContactDetails> otherClientsJoin = root.join("otherClients");
 //        Join<CaseArchiveCheck, Folder> archiveCheckJoin = root.join("caseArchiveCheck");
         tupleQuery.multiselect(
+                root.get(Case_.id).alias("id"),
                 root.get("name").alias("name"),
                 root.get("dossiernummer").alias("dossiernummer"),
                 root.get("leadnummer").alias("leadnummer"),
@@ -57,8 +87,8 @@ public class JPARunner {
 
                 folderJoin.get("name").alias("folderName"),
 
+                clientJoin.get("straatnaam").alias("straatnaam"),
                 clientJoin.get("huisnummer").alias("huisnummer"),
-                clientJoin.get("straatnaam").alias("straatnaam")
 //                clientJoin.get("toevoeging").alias("toevoeging"),
 //                clientJoin.get("postcode").alias("postcode"),
 //                clientJoin.get("woonplaats").alias("woonplaats"),
@@ -66,7 +96,8 @@ public class JPARunner {
 //                clientJoin.get("geslacht" ).alias("geslacht"),
 //                clientJoin.get("naam" ).alias("mainContactNaam"),
 //                clientJoin.get("email" ).alias("mainContactEmail"),
-//                clientJoin.get("telefoon" ).alias("mainContactTelefoon"),
+                emailJoin.get("value").alias("mainContactEmail"),
+                telefoonJoin.get("value").alias("mainContactTelefoon")
 
 //                contactClientJoin.get("email").alias("contactClientEmail"),
 //
@@ -100,6 +131,7 @@ public class JPARunner {
             whereClause = cb.and(whereClause, searchTermPredicate);
         }
 
+//        whereClause = cb.and(whereClause, cb.equal(root.get(Case_.id), 11823));
         tupleQuery.where(whereClause);
 
 //        if (sortableColumns.contains(sort)) {
@@ -134,7 +166,7 @@ public class JPARunner {
 
         System.out.println("Aantal: "+ result.size());
         for ( Tuple t : result) {
-            System.out.println("dossiernummer:"+t.get("dossiernummer"));
+            System.out.println(String.format("case id: '%d', dossiernummer:'%s' telefoon: '%s', email: '%s'",t.get("id"),t.get("dossiernummer"),t.get("mainContactTelefoon"),t.get("mainContactEmail")));
         }
     }
 
