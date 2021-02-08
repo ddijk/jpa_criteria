@@ -69,8 +69,8 @@ public class JPARunner {
         Join<Case, ClientContactDetails> clientJoin = root.join(Case_.client);
 
         //  final Join<ClientContactDetails, ClientContactValueWithType> telefoonJoin =
-        final ListJoin<ClientContactDetails, ClientContactValueWithType> emailJoin = clientJoin.join(ClientContactDetails_.email);
-        final ListJoin<ClientContactDetails, ClientContactValueWithType> telefoonJoin = clientJoin.join(ClientContactDetails_.telefoon);
+        final ListJoin<ClientContactDetails, ClientContactValueWithType> emailJoin = clientJoin.join(ClientContactDetails_.email,JoinType.LEFT);
+        final ListJoin<ClientContactDetails, ClientContactValueWithType> telefoonJoin = clientJoin.join(ClientContactDetails_.telefoon, JoinType.LEFT);
 //        Join<Case, ClientContactDetails> contactClientJoin = root.join("contactClient");
 //        Join<Case, ClientContactDetails> otherClientsJoin = root.join("otherClients");
 //        Join<CaseArchiveCheck, Folder> archiveCheckJoin = root.join("caseArchiveCheck");
@@ -81,25 +81,23 @@ public class JPARunner {
                 root.get("leadnummer").alias("leadnummer"),
                 root.get("bijzondereStatus").alias("bijzondereStatus"),
                 root.get("datumToedracht").alias("datumToedracht"),
-//                root.get("unreadCount").alias("unreadCount"),
-//                root.get("debtorBalanceAcountView").alias("saldoAV"),
-//                root.get("debtorBalance").alias("saldo"),
+//                root.get("unreadCount").alias("unreadCount"), => from ChatService
+                root.get("debtorBalanceAcountView").alias("saldoAV"),
+                root.get("debtorBalance").alias("saldo"),
 
                 folderJoin.get("name").alias("folderName"),
 
                 clientJoin.get("straatnaam").alias("straatnaam"),
                 clientJoin.get("huisnummer").alias("huisnummer"),
-//                clientJoin.get("toevoeging").alias("toevoeging"),
-//                clientJoin.get("postcode").alias("postcode"),
-//                clientJoin.get("woonplaats").alias("woonplaats"),
-//                clientJoin.get("defaultContact" ).alias("defaultContact"),
-//                clientJoin.get("geslacht" ).alias("geslacht"),
-//                clientJoin.get("naam" ).alias("mainContactNaam"),
-//                clientJoin.get("email" ).alias("mainContactEmail"),
+                clientJoin.get("toevoeging").alias("toevoeging"),
+                clientJoin.get("postcode").alias("postcode"),
+                clientJoin.get("woonplaats").alias("woonplaats"),
+                clientJoin.get("defaultContact" ).alias("defaultContact"),
+                clientJoin.get("geslacht" ).alias("geslacht"),
+                clientJoin.get("naam" ).alias("mainContactNaam"),
                 emailJoin.get("value").alias("mainContactEmail"),
                 telefoonJoin.get("value").alias("mainContactTelefoon")
 
-//                contactClientJoin.get("email").alias("contactClientEmail"),
 //
 //                // tpa
 //                root.get("lastPaymentDate").alias("tpaLastPaymentDate"),
@@ -155,7 +153,7 @@ public class JPARunner {
 //            }
 //
 //        }
-
+        tupleQuery.orderBy(cb.asc(root.get(Case_.id)));
         int pageSize = 20;
         final TypedQuery<Tuple> emQuery = em.createQuery(tupleQuery);
         emQuery.setMaxResults(pageSize);
