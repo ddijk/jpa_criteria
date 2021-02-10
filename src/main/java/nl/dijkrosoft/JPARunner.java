@@ -1,6 +1,12 @@
 package nl.dijkrosoft;
 
+import nl.bytesoflife.clienten.CasesResponse;
+import nl.bytesoflife.clienten.Zaken;
+import nl.bytesoflife.clienten.cases.CaseFolder;
+import nl.bytesoflife.clienten.cases.CaseListItem;
+import nl.bytesoflife.clienten.cases.Client;
 import nl.bytesoflife.clienten.data.*;
+import nl.bytesoflife.clienten.finance.praktijk.DerdenGeldenCase;
 import nl.bytesoflife.clienten.finance.praktijk.PageHelper;
 
 import javax.persistence.*;
@@ -11,8 +17,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class JPARunner {
-    static List<Integer> selectedPraktijken = Arrays.asList(1313, 1, 43);
-    static final List<Integer> authPraktijken = Arrays.asList(1313, 1);
+    public static List<Integer> selectedPraktijken = Arrays.asList(1313, 1, 43);
+    public static final List<Integer> authPraktijken = Arrays.asList(1313, 1);
 
     public static void main(String[] args) {
         EntityManagerFactory emf = null;
@@ -23,7 +29,6 @@ public class JPARunner {
             em = emf.createEntityManager();
 
             CriteriaBuilder cb = em.getCriteriaBuilder();
-            testCaseListRefactoring(em, cb);
 
 //            listJoin(em, cb);
 
@@ -59,114 +64,6 @@ public class JPARunner {
         }
     }
 
-    private static void testCaseListRefactoring(EntityManager em, CriteriaBuilder cb) {
-
-        final CriteriaQuery<Tuple> tupleQuery = cb.createTupleQuery();
-        final Root<Case> root = tupleQuery.from(Case.class);
-
-        Join<Case, AccountviewProject> projectJoin = root.join(Case_.accountviewProject);
-        Join<Case, Folder> folderJoin = root.join(Case_.folder);
-        Join<Case, ClientContactDetails> clientJoin = root.join(Case_.client);
-
-        //  final Join<ClientContactDetails, ClientContactValueWithType> telefoonJoin =
-        final ListJoin<ClientContactDetails, ClientContactValueWithType> emailJoin = clientJoin.join(ClientContactDetails_.email,JoinType.LEFT);
-        final ListJoin<ClientContactDetails, ClientContactValueWithType> telefoonJoin = clientJoin.join(ClientContactDetails_.telefoon, JoinType.LEFT);
-//        Join<Case, ClientContactDetails> contactClientJoin = root.join("contactClient");
-//        Join<Case, ClientContactDetails> otherClientsJoin = root.join("otherClients");
-//        Join<CaseArchiveCheck, Folder> archiveCheckJoin = root.join("caseArchiveCheck");
-        tupleQuery.multiselect(
-                root.get(Case_.id).alias("id"),
-                root.get("name").alias("name"),
-                root.get("dossiernummer").alias("dossiernummer"),
-                root.get("leadnummer").alias("leadnummer"),
-                root.get("bijzondereStatus").alias("bijzondereStatus"),
-                root.get("datumToedracht").alias("datumToedracht"),
-//                root.get("unreadCount").alias("unreadCount"), => from ChatService
-                root.get("debtorBalanceAcountView").alias("saldoAV"),
-                root.get("debtorBalance").alias("saldo"),
-
-                folderJoin.get("name").alias("folderName"),
-
-                clientJoin.get("straatnaam").alias("straatnaam"),
-                clientJoin.get("huisnummer").alias("huisnummer"),
-                clientJoin.get("toevoeging").alias("toevoeging"),
-                clientJoin.get("postcode").alias("postcode"),
-                clientJoin.get("woonplaats").alias("woonplaats"),
-                clientJoin.get("defaultContact" ).alias("defaultContact"),
-                clientJoin.get("geslacht" ).alias("geslacht"),
-                clientJoin.get("naam" ).alias("mainContactNaam"),
-                emailJoin.get("value").alias("mainContactEmail"),
-                telefoonJoin.get("value").alias("mainContactTelefoon")
-
-//
-//                // tpa
-//                root.get("lastPaymentDate").alias("tpaLastPaymentDate"),
-//                otherClientsJoin.get("naam").alias("tpaNaam"),
-//                otherClientsJoin.get("defaultContact").alias("tpaDefaultContact"),
-//                otherClientsJoin.get("email").alias("tpaEmail"), // multie val
-//                otherClientsJoin.get("instantie").alias("tpaInstantie"),
-//                otherClientsJoin.get("postbus").alias("tpaPostbus"),
-//                otherClientsJoin.get("postcodePostbus").alias("tpaPostcodePostbus"),
-//                otherClientsJoin.get("plaatsnaamPostbus").alias("tpaPlaatsnaamPostbus"),
-//                otherClientsJoin.get("telefoon").alias("tpaTelefoon"),  // multi val
-
-//                projectJoin.get("BLOK").alias("blok"),
-
-//                archiveCheckJoin.get("praktijkhoofdCheckedDate").alias("praktijkhoofdCheckedDate"),
-//                archiveCheckJoin.get("needsPraktijkhoofdChecked").alias("needsPraktijkhoofdChecked")
-//                folderJoin.get("accountviewCompany").alias("company")
-
-        );
-
-        Predicate whereClause = getPred(cb, root.get("folder").get("id"), selectedPraktijken, authPraktijken);
-        final String searchTerm = "";// filterz.getName();
-        if (searchTerm != null && searchTerm.length() > 0) {
-//            .info(String.format("Searchterm '%s'", searchTerm));
-            final String likeSearchTerm = String.format("%%%s%%", searchTerm);
-            final Predicate searchTermPredicate = cb.or(
-                    cb.like(root.get("dossiernummer"), likeSearchTerm));
-
-            whereClause = cb.and(whereClause, searchTermPredicate);
-        }
-
-//        whereClause = cb.and(whereClause, cb.equal(root.get(Case_.id), 11823));
-        tupleQuery.where(whereClause);
-
-//        if (sortableColumns.contains(sort)) {
-//
-//            if ( sort.indexOf(":") == -1) {
-//                if ("ASC".equalsIgnoreCase(direction)) {
-//
-//                    tupleQuery.orderBy(cb.asc(projectJoin.get(sort)));
-//                } else {
-//                    tupleQuery.orderBy(cb.desc(projectJoin.get(sort)));
-//
-//                }
-//            } else {
-//                if ("ASC".equalsIgnoreCase(direction)) {
-//
-//                    tupleQuery.orderBy(cb.asc(root.get(sort.split(":", 2)[1])));
-//                } else {
-//                    tupleQuery.orderBy(cb.desc(root.get(sort.split(":", 2)[1])));
-//
-//                }
-//            }
-//
-//        }
-        tupleQuery.orderBy(cb.asc(root.get(Case_.id)));
-        int pageSize = 20;
-        final TypedQuery<Tuple> emQuery = em.createQuery(tupleQuery);
-        emQuery.setMaxResults(pageSize);
-        emQuery.setFirstResult(0);
-
-
-        List<Tuple> result = emQuery.getResultList();
-
-        System.out.println("Aantal: "+ result.size());
-        for ( Tuple t : result) {
-            System.out.println(String.format("case id: '%d', dossiernummer:'%s' telefoon: '%s', email: '%s'",t.get("id"),t.get("dossiernummer"),t.get("mainContactTelefoon"),t.get("mainContactEmail")));
-        }
-    }
 
     private static void createCase(EntityManager em) {
         Case c = new Case();
@@ -256,7 +153,7 @@ public class JPARunner {
         System.out.println("res:" + n);
     }
 
-    private static Predicate createPraktijkFilter(CriteriaBuilder cb, Path<Object> id) {
+    public static Predicate createPraktijkFilter(CriteriaBuilder cb, Path<Object> id) {
 
         return getPred(cb, id, selectedPraktijken, authPraktijken);
     }
