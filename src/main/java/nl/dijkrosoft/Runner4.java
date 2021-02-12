@@ -9,6 +9,7 @@ import nl.bytesoflife.clienten.finance.praktijk.PageHelper;
 
 import javax.persistence.*;
 import javax.persistence.criteria.*;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -26,11 +27,11 @@ public class Runner4 {
             emf = Persistence.createEntityManagerFactory("myPU2");
             em = emf.createEntityManager();
 
-//            CasesResponse cr = runQuery(em);
-            long caseId = 36;
-            getOtherCaseContactDetails(caseId, em);
-//            ObjectMapper om = new ObjectMapper();
-//            om.writerWithDefaultPrettyPrinter().writeValue(System.out, cr);
+            CasesResponse cr = runQuery(em);
+//            long caseId = 36;
+//            getOtherCaseContactDetails(caseId, em);
+            ObjectMapper om = new ObjectMapper();
+            om.writerWithDefaultPrettyPrinter().writeValue(System.out, cr);
 
         } catch (Exception ex ) {
             ex.printStackTrace();
@@ -97,6 +98,7 @@ public class Runner4 {
 //                root.get("unreadCount").alias("unreadCount"), => from ChatService
                 root.get(Case_.debtorBalanceAcountView).alias("saldoAV"),
                 root.get(Case_.debtorBalance).alias("saldo"),
+                root.get(Case_.lastPaymentDate).alias("lastPaymentDate"),
 
                 folderJoin.get(Folder_.name).alias("folderName"),
 
@@ -116,7 +118,6 @@ public class Runner4 {
                 projectJoin.get(AccountviewProject_.BLOK).alias("blok"),
 
                 // tpa
-                root.get(Case_.lastPaymentDate).alias("tpaLastPaymentDate"),
 //                otherContactJoin.get(ClientContactDetails_.id).alias("tpaId"),
 //                otherContactJoin.get(ClientContactDetails_.naam).alias("tpaNaam"),
 //                otherContactJoin.get(ClientContactDetails_.defaultContact).alias("tpaDefaultContact"),
@@ -188,14 +189,17 @@ public class Runner4 {
         for (Tuple t : result) {
             //System.out.println(String.format("case id: '%d', dossiernummer:'%s' telefoon: '%s', email: '%s'",t.get("id"),t.get("dossiernummer"),t.get("mainContactTelefoon"),t.get("mainContactEmail")));
             final Long id = t.get("id", Long.class);
+            System.out.println("****** id "+id);
             System.out.println(String.format("case id: '%d', dossiernummer:'%s' ", id, t.get("dossiernummer")));
-            List<Contact> mainCaseEmailAddresses = getContactList(em, id, ClientContactDetails::getEmail);
-            List<Contact> mainCaseTelefoonNrs = getContactList(em, id, ClientContactDetails::getTelefoon);
+            List<Contact> mainCaseEmailAddresses = getMainCaseList(em, id, ClientContactDetails::getEmail);
+            System.out.println("mainCaseEmailAddresses:"+ mainCaseEmailAddresses);
+            List<Contact> mainCaseTelefoonNrs = getMainCaseList(em, id, ClientContactDetails::getTelefoon);
+            System.out.println("mainCaseTelefoonNrs:"+ mainCaseTelefoonNrs);
             final Long contactClientId = t.get("contactClientId", Long.class);
 
-            List<Contact> contactCaseEmailAddresses = getContactList(em, contactClientId, ClientContactDetails::getEmail);
+            List<Contact> contactCaseEmailAddresses = getContactCaseList(em, id, ClientContactDetails::getEmail);
 
-            System.out.println("Email addresses: "+ contactCaseEmailAddresses);
+            System.out.println("Contact case: Email addresses: "+ contactCaseEmailAddresses);
 
             // zoek de otherContacts ( tpa ) erbij:
 //            Long tpaId = t.get("tpaId", Long.class );
@@ -203,9 +207,7 @@ public class Runner4 {
 //            List<Contact> emailList = getContactList(em, tpaId, ClientContactDetails::getEmail);
 //            List<Contact> telefoonList = getContactList(em, tpaId, ClientContactDetails::getTelefoon);
 
-            Long caseId = t.get("id", Long.class);
-
-            OtherCaseContactDetails otherCaseContactDetails = getOtherCaseContactDetails(caseId, em);
+            OtherCaseContactDetails otherCaseContactDetails = getOtherCaseContactDetails(id, em );
 
             List<OtherCaseContactDetails> otherCaseContactDetailsList = new ArrayList<>();
             otherCaseContactDetailsList.add(otherCaseContactDetails);
@@ -226,7 +228,10 @@ public class Runner4 {
                             t.get("postcode", String.class),
                             t.get("woonplaats", String.class)),
                     new ContactCaseContactDetails(contactCaseEmailAddresses),
-                    otherCaseContactDetailsList
+                    otherCaseContactDetailsList,
+                   /* t.get("lastPaymentDate", LocalDate.class)*/LocalDate.now(),
+                    t.get("saldo", Double.class),
+                    t.get("saldoAV", Double.class)
             );
             final Boolean blok = t.get("blok", Boolean.class);
             if (blok != null) {
@@ -251,59 +256,59 @@ public class Runner4 {
     private static OtherCaseContactDetails getOtherCaseContactDetails(Long caseId, EntityManager em) {
 
 
-        CriteriaBuilder cb = em.getCriteriaBuilder();
+        final TypedQuery<ClientContactDetails> query = em.createQuery("Select c from ClientContactDetails  c where c.otherCase.id=?1 and c.typeDerde='Wederpartij'" , ClientContactDetails.class);
+        query.setParameter(1, caseId);
 
-        final CriteriaQuery<Contact> tupleQuery = cb.createQuery(Contact.class);
+        List<Contact> emailLijst = new ArrayList<>();
+        List<Contact> telefoonLijst = new ArrayList<>();
+        final List<ClientContactDetails> resultList = query.getResultList();
+        if ( resultList.size() > 0) {
 
-        final Root<Case> caseRoot = tupleQuery.from(Case.class);
+            final ClientContactDetails ccd = resultList.get(0);
+            System.out.println("here we go getOtherCaseList:" + ccd);
+            emailLijst.addAll(ccd.getEmail().stream().map(e -> new Contact(e.getValue(), e.getIsDefault())).collect(Collectors.toList()));
+            telefoonLijst.addAll(ccd.getTelefoon().stream().map(e -> new Contact(e.getValue(), e.getIsDefault())).collect(Collectors.toList()));
 
-        final ListJoin<Case, ClientContactDetails> contactCaseJoin = caseRoot.join(Case_.otherClients);
-        final ListJoin<ClientContactDetails, ClientContactValueWithType> valueJoin = contactCaseJoin.join(ClientContactDetails_.email);
-
-        tupleQuery.where(cb.and(
-                cb.equal(caseRoot.get(Case_.id), caseId),
-                cb.equal(contactCaseJoin.get(ClientContactDetails_.typeDerde), "Wederpartij")
-                )
-        );
-//        tupleQuery.multiselect(valueJoin.get(ClientContactValueWithType_.value).alias("val"), valueJoin.get(ClientContactValueWithType_.isDefault).alias("isDef"));
-        tupleQuery.select(cb.construct(Contact.class,valueJoin.get(ClientContactValueWithType_.value).alias("val"), valueJoin.get(ClientContactValueWithType_.isDefault).alias("isDef")));
-
-
-//
-//        final Query query = em.createQuery("Select ccd.naam, ccd.defaultContact, ccd.instantie from ClientContactDetails ccd where ccd.otherCase = ?1 and ccd.typeDerde = ?2");
-//        query.setParameter(1, caseId);
-//        query.setParameter(2, "Wederpartij");
-
-        OtherCaseContactDetails otherCaseContactDetails = new OtherCaseContactDetails();
-        for ( Contact t : em.createQuery(tupleQuery).getResultList()) {
-//            System.out.println(String.format("value='%s', isDefault='%s'", t.get("val"), t.get("isDef")));
-            System.out.println(t);
-            if ( otherCaseContactDetails.getEmail() == null) {
-                otherCaseContactDetails.setEmail(new ArrayList<>());
-            }
-            otherCaseContactDetails.getEmail().add(t);
-//                    otherCaseContactDetails.setNaam(o.);
+            return new OtherCaseContactDetails(ccd.getNaam(), ccd.getDefaultContact(), emailLijst, ccd.getInstantie(),
+                    ccd.getPostbus(), ccd.getPostcodePostbus(), ccd.getPlaatsnaamPostbus(), telefoonLijst, ccd.getTypeDerde() );
+        } else {
+            return null;
         }
-//                t.get("tpaNaam", String.class),
-//                t.get("tpaDefaultContact", DefaultContact.class),
-//                Collections.emptyList(),
-//                t.get("tpaInstantie", String.class),
-//                t.get("tpaPostbus", String.class),
-//                t.get("tpaPostcodePostbus", String.class),
-//                t.get("tpaPlaatsnaamPostbus", String.class),
-//                Collections.emptyList(),
-//                t.get("tpaTypeDerde", String.class)
-//        );
-        return otherCaseContactDetails;
+
+
     }
 
-    private static List<Contact> getContactList(EntityManager em, Long contactClientId, Function<ClientContactDetails, List<ClientContactValueWithType>> valueRetriever) {
-        final TypedQuery<ClientContactDetails> query = em.createQuery("Select c from ClientContactDetails  c where c.id=?1", ClientContactDetails.class);
-        query.setParameter(1, contactClientId);
+    private static List<Contact> getContactCaseList(EntityManager em, Long caseId, Function<ClientContactDetails, List<ClientContactValueWithType>> valueRetriever) {
+        final TypedQuery<ClientContactDetails> query = em.createQuery("Select c from ClientContactDetails  c where c.contactCase.id=?1 and c.typeDerde='Wederpartij'", ClientContactDetails.class);
+        query.setParameter(1, caseId);
 
         List<Contact> result = new ArrayList<>();
         for (ClientContactDetails ccd : query.getResultList()) {
-            System.out.println("here we go:" + ccd);
+            System.out.println("here we go getContactCaseList:" + ccd);
+            result.addAll(valueRetriever.apply(ccd).stream().map(e -> new Contact(e.getValue(), e.getIsDefault())).collect(Collectors.toList()));
+        }
+        return result;
+    }
+
+    private static List<Contact> getMainCaseList(EntityManager em, Long caseId, Function<ClientContactDetails, List<ClientContactValueWithType>> valueRetriever) {
+        final TypedQuery<ClientContactDetails> query = em.createQuery("Select c from ClientContactDetails  c where c.mainCase.id=?1" , ClientContactDetails.class);
+        query.setParameter(1, caseId);
+
+        List<Contact> result = new ArrayList<>();
+        for (ClientContactDetails ccd : query.getResultList()) {
+            System.out.println("here we go getMainCaseList:" + ccd);
+            result.addAll(valueRetriever.apply(ccd).stream().map(e -> new Contact(e.getValue(), e.getIsDefault())).collect(Collectors.toList()));
+        }
+        return result;
+    }
+
+    private static List<Contact> getOtherCaseList(EntityManager em, Long caseId, Function<ClientContactDetails, List<ClientContactValueWithType>> valueRetriever) {
+        final TypedQuery<ClientContactDetails> query = em.createQuery("Select c from ClientContactDetails  c where c.otherCase.id=?1 and c.typeDerde='Wederpartij'" , ClientContactDetails.class);
+        query.setParameter(1, caseId);
+
+        List<Contact> result = new ArrayList<>();
+        for (ClientContactDetails ccd : query.getResultList()) {
+            System.out.println("here we go getOtherCaseList:" + ccd);
             result.addAll(valueRetriever.apply(ccd).stream().map(e -> new Contact(e.getValue(), e.getIsDefault())).collect(Collectors.toList()));
         }
         return result;
