@@ -253,7 +253,7 @@ public class Runner4 {
 
         CriteriaBuilder cb = em.getCriteriaBuilder();
 
-        final CriteriaQuery<Tuple> tupleQuery = cb.createTupleQuery();
+        final CriteriaQuery<Contact> tupleQuery = cb.createQuery(Contact.class);
 
         final Root<Case> caseRoot = tupleQuery.from(Case.class);
 
@@ -265,7 +265,8 @@ public class Runner4 {
                 cb.equal(contactCaseJoin.get(ClientContactDetails_.typeDerde), "Wederpartij")
                 )
         );
-        tupleQuery.multiselect(valueJoin.get(ClientContactValueWithType_.value).alias("val"), valueJoin.get(ClientContactValueWithType_.isDefault).alias("isDef"));
+//        tupleQuery.multiselect(valueJoin.get(ClientContactValueWithType_.value).alias("val"), valueJoin.get(ClientContactValueWithType_.isDefault).alias("isDef"));
+        tupleQuery.select(cb.construct(Contact.class,valueJoin.get(ClientContactValueWithType_.value).alias("val"), valueJoin.get(ClientContactValueWithType_.isDefault).alias("isDef")));
 
 
 //
@@ -274,8 +275,13 @@ public class Runner4 {
 //        query.setParameter(2, "Wederpartij");
 
         OtherCaseContactDetails otherCaseContactDetails = new OtherCaseContactDetails();
-        for ( Tuple t : em.createQuery(tupleQuery).getResultList()) {
-            System.out.println(String.format("value='%s', isDefault='%s'", t.get("val"), t.get("isDef")));
+        for ( Contact t : em.createQuery(tupleQuery).getResultList()) {
+//            System.out.println(String.format("value='%s', isDefault='%s'", t.get("val"), t.get("isDef")));
+            System.out.println(t);
+            if ( otherCaseContactDetails.getEmail() == null) {
+                otherCaseContactDetails.setEmail(new ArrayList<>());
+            }
+            otherCaseContactDetails.getEmail().add(t);
 //                    otherCaseContactDetails.setNaam(o.);
         }
 //                t.get("tpaNaam", String.class),
