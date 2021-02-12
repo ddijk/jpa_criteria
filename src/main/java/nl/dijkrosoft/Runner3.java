@@ -50,9 +50,9 @@ public class Runner3 {
         final CriteriaQuery<Tuple> tupleQuery = cb.createTupleQuery();
         final Root<Case> root = tupleQuery.from(Case.class);
 
-        Join<Case, AccountviewProject> projectJoin = root.join(Case_.accountviewProject);
+        Join<Case, AccountviewProject> projectJoin = root.join(Case_.accountviewProject, JoinType.LEFT);
         Join<Case, Folder> folderJoin = root.join(Case_.folder);
-        Join<Case, ClientContactDetails> clientJoin = root.join(Case_.client);
+        Join<Case, ClientContactDetails> clientJoin = root.join(Case_.client, JoinType.LEFT);
 
 
         // contactClient
@@ -166,12 +166,12 @@ public class Runner3 {
             List<OtherClient> otherClients = Collections.emptyList();
             CaseListItem item = new CaseListItem(t.get("name", String.class),
                     t.get("dossiernummer", String.class),
-                    33L/*t.get("leadnummer", String.class)*/,
+                    t.get("leadnummer", Long.class),
                     t.get("bijzondereStatus", String.class),
                     t.get("datumToedracht", String.class),
                      new CaseFolder( t.get("folderName", String.class)),
-                        new Client("def"/*t.get("defaultContact", Integer.class).toString()*/,
-                                "man"/*t.get("geslacht", String.class)*/,
+                        new Client(t.get("defaultContact", DefaultContact.class),
+                                t.get("geslacht", Geslacht.class),
                                 t.get("mainContactNaam", String.class ),
                                 emailList,
                                 telefoonList,
@@ -183,7 +183,10 @@ public class Runner3 {
                                 new ContactClient(emailList),
                                 otherClients
                                 );
-            item.setAccountviewProject(new Project(t.get("blok", Boolean.class)));
+            final Boolean blok = t.get("blok", Boolean.class);
+            if ( blok != null) {
+                item.setAccountviewProject(new Project(blok));
+            }
             final Date praktijkhoofdCheckedDate = t.get("praktijkhoofdCheckedDate", Date.class);
             final Boolean needsPraktijkhoofdChecked = t.get("needsPraktijkhoofdChecked", Boolean.class);
 

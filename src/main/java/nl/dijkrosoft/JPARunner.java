@@ -31,7 +31,7 @@ public class JPARunner {
             CriteriaBuilder cb = em.getCriteriaBuilder();
 
 //            listJoin(em, cb);
-
+            testQueryForProjects(em, cb);
 
         } finally {
             if (em != null)
