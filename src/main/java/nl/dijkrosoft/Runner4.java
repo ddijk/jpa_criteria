@@ -9,6 +9,9 @@ import nl.bytesoflife.clienten.finance.praktijk.PageHelper;
 
 import javax.persistence.*;
 import javax.persistence.criteria.*;
+import java.io.BufferedWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
@@ -22,7 +25,7 @@ public class Runner4 {
     public static void main(String[] args) {
         EntityManagerFactory emf = null;
         EntityManager em = null;
-        try {
+        try ( BufferedWriter bufferedWriter = Files.newBufferedWriter(Paths.get("/Users/dickdijk/Advobot/Advobot/real_9898.json"))) {
 
             emf = Persistence.createEntityManagerFactory("myPU2");
             em = emf.createEntityManager();
@@ -31,7 +34,8 @@ public class Runner4 {
 //            long caseId = 36;
 //            getOtherCaseContactDetails(caseId, em);
             ObjectMapper om = new ObjectMapper();
-            om.writerWithDefaultPrettyPrinter().writeValue(System.out, cr);
+            om.writerWithDefaultPrettyPrinter().writeValue(bufferedWriter, cr);
+
 
         } catch (Exception ex ) {
             ex.printStackTrace();
@@ -77,15 +81,7 @@ public class Runner4 {
         Join<Case, Folder> folderJoin = root.join(Case_.folder);
         Join<Case, ClientContactDetails> clientJoin = root.join(Case_.client, JoinType.LEFT);
 
-
-        // contact_case
         Join<Case, ClientContactDetails> contactClientJoin = root.join(Case_.contactClient, JoinType.LEFT);
-
-        // other_case
-//        Join<Case, ClientContactDetails> otherContactJoin = root.join(Case_.otherClients, JoinType.LEFT);
-
-
-
 
         Join<Case,CaseArchiveCheck> archiveCheckJoin = root.join(Case_.caseArchiveCheck, JoinType.LEFT);
         tupleQuery.multiselect(
@@ -110,28 +106,13 @@ public class Runner4 {
                 clientJoin.get(ClientContactDetails_.defaultContact).alias("defaultContact"),
                 clientJoin.get(ClientContactDetails_.geslacht).alias("geslacht"),
                 clientJoin.get(ClientContactDetails_.naam).alias("mainContactNaam"),
-//                emailJoinClient.get(ClientContactValueWithType_.value).alias("mainContactEmail"),
-//                telefoonJoinClient.get(ClientContactValueWithType_.value).alias("mainContactTelefoon"),
-//
-//                emailJoinContactClient.get(ClientContactValueWithType_.value),
-                contactClientJoin.get(ClientContactDetails_.id).alias("contactClientId"),
-                projectJoin.get(AccountviewProject_.BLOK).alias("blok"),
 
-                // tpa
-//                otherContactJoin.get(ClientContactDetails_.id).alias("tpaId"),
-//                otherContactJoin.get(ClientContactDetails_.naam).alias("tpaNaam"),
-//                otherContactJoin.get(ClientContactDetails_.defaultContact).alias("tpaDefaultContact"),
-//                otherContactJoin.get(ClientContactDetails_.instantie).alias("tpaInstantie"),
-//                otherContactJoin.get(ClientContactDetails_.postbus).alias("tpaPostbus"),
-//                otherContactJoin.get(ClientContactDetails_.postcodePostbus).alias("tpaPostcodePostbus"),
-//                otherContactJoin.get(ClientContactDetails_.plaatsnaamPostbus).alias("tpaPlaatsnaamPostbus"),
-//                otherContactJoin.get(ClientContactDetails_.typeDerde).alias("tpaTypeDerde"),
-//                emailJoinOtherContact.get(ClientContactValueWithType_.value).alias("tpaContactEmail"),
-//                telefoonJoinOtherContact.get(ClientContactValueWithType_.value).alias("tpaContactTelefoon"),
+                contactClientJoin.get(ClientContactDetails_.id).alias("contactClientId"),
+
+                projectJoin.get(AccountviewProject_.BLOK).alias("blok"),
 
                 archiveCheckJoin.get(CaseArchiveCheck_.praktijkhoofdCheckedDate).alias("praktijkhoofdCheckedDate"),
                 archiveCheckJoin.get(CaseArchiveCheck_.needsPraktijkhoofdChecked).alias("needsPraktijkhoofdChecked")
-//                folderJoin.get("accountviewCompany").alias("company")
 
         );
 
@@ -148,12 +129,6 @@ public class Runner4 {
             whereClause = cb.and(whereClause, searchTermPredicate);
         }
 
-        // alleen otherClientsJoin van typeDerde=wederpartij => filter in conversie naar JSON
-//        whereClause = cb.and(whereClause, cb.equal(otherContactJoin.get(ClientContactDetails_.typeDerde), "Wederpartij"));
-
-//        whereClause = cb.and(whereClause, cb.equal(root.get(Case_.id), cb.any(subquery)));
-
-//        whereClause = cb.and(whereClause, cb.equal(root.get(Case_.id), 61037));
         tupleQuery.where(whereClause);
 
 //        if (sortableColumns.contains(sort)) {
@@ -201,12 +176,6 @@ public class Runner4 {
 
             System.out.println("Contact case: Email addresses: "+ contactCaseEmailAddresses);
 
-            // zoek de otherContacts ( tpa ) erbij:
-//            Long tpaId = t.get("tpaId", Long.class );
-
-//            List<Contact> emailList = getContactList(em, tpaId, ClientContactDetails::getEmail);
-//            List<Contact> telefoonList = getContactList(em, tpaId, ClientContactDetails::getTelefoon);
-
             OtherCaseContactDetails otherCaseContactDetails = getOtherCaseContactDetails(id, em );
 
             List<OtherCaseContactDetails> otherCaseContactDetailsList = new ArrayList<>();
@@ -229,7 +198,7 @@ public class Runner4 {
                             t.get("woonplaats", String.class)),
                     new ContactCaseContactDetails(contactCaseEmailAddresses),
                     otherCaseContactDetailsList,
-                   /* t.get("lastPaymentDate", LocalDate.class)*/LocalDate.now(),
+                    t.get("lastPaymentDate", LocalDate.class),
                     t.get("saldo", Double.class),
                     t.get("saldoAV", Double.class)
             );
