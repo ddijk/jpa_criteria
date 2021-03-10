@@ -1,12 +1,6 @@
 package nl.dijkrosoft;
 
-import nl.bytesoflife.clienten.CasesResponse;
-import nl.bytesoflife.clienten.Zaken;
-import nl.bytesoflife.clienten.cases.CaseFolder;
-import nl.bytesoflife.clienten.cases.CaseListItem;
-import nl.bytesoflife.clienten.cases.Client;
 import nl.bytesoflife.clienten.data.*;
-import nl.bytesoflife.clienten.finance.praktijk.DerdenGeldenCase;
 import nl.bytesoflife.clienten.finance.praktijk.PageHelper;
 
 import javax.persistence.*;
@@ -18,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class JPARunner {
     public static List<Integer> selectedPraktijken = Arrays.asList(1313, 1, 43);
-    public static final List<Integer> authPraktijken = Arrays.asList(1313, 1);
+    public static final List<Long> authPraktijken = Arrays.asList(1313L);
 
     public static void main(String[] args) {
         EntityManagerFactory emf = null;
@@ -182,7 +176,7 @@ public class JPARunner {
     }
 
 
-    static Predicate getPred(CriteriaBuilder cb, Path<Object> folderId, List<Integer> selectedPraktijken, List<Integer> authPraktijken) {
+    static Predicate getPred(CriteriaBuilder cb, Path<Object> folderId, List<Integer> selectedPraktijken, List<Long> authPraktijken) {
 
         List<Integer> effectivePraktijken = selectedPraktijken.stream().filter(e -> authPraktijken.contains(e)).collect(Collectors.toList());
         System.out.println("EffectivePraktijken: " + effectivePraktijken);

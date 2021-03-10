@@ -1,6 +1,8 @@
 package nl.dijkrosoft;
 
+import nl.bytesoflife.clienten.data.Case;
 import nl.bytesoflife.clienten.data.CaseArchiveCheck;
+import nl.bytesoflife.clienten.data.Case_;
 import nl.bytesoflife.clienten.data.ClientContactDetails;
 
 import javax.persistence.EntityManager;
@@ -8,6 +10,13 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
+import static nl.bytesoflife.clienten.data.Filters.createPraktijkenFilter;
+import static nl.dijkrosoft.JPARunner.authPraktijken;
+import static nl.dijkrosoft.JPARunner.selectedPraktijken;
 
 public class JPQL_Runner {
 
@@ -21,16 +30,18 @@ public class JPQL_Runner {
 
             CriteriaBuilder cb = em.getCriteriaBuilder();
 
-//            listJoin(em, cb);
+        final CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
 
-            final TypedQuery<ClientContactDetails> query = em.createQuery("Select a from ClientContactDetails a where a.id=3036", ClientContactDetails.class);
+        final Root<Case> caseRoot = countQuery.from(Case.class);
+        Predicate praktijkenFilter = createPraktijkenFilter(cb, caseRoot.get(Case_.folder).get("id"), selectedPraktijken, authPraktijken);
+        countQuery.where(cb.and(praktijkenFilter, archivedOnly(cb, caseRoot)));
+//            countQuery.where(cb.and(praktijkenFilter));
+        countQuery.select(cb.count(caseRoot));
 
-            for ( ClientContactDetails c:    query.getResultList()) {
-                System.out.println(c);
-            }
+        long totalElements = em.createQuery(countQuery).getSingleResult();
 
 
-
+            System.out.println("total:"+totalElements);
 
         } finally {
             if (em != null)
@@ -41,4 +52,10 @@ public class JPQL_Runner {
         }
 
     }
+
+
+    static Predicate archivedOnly(CriteriaBuilder cb, Root<Case> root) {
+        return cb.isTrue(root.get(Case_.isArchived));
+    }
+
 }

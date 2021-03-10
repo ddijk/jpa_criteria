@@ -2,9 +2,7 @@ package nl.dijkrosoft;
 
 import nl.bytesoflife.clienten.CasesResponse;
 import nl.bytesoflife.clienten.Zaken;
-import nl.bytesoflife.clienten.cases.CaseFolder;
 import nl.bytesoflife.clienten.cases.CaseListItem;
-import nl.bytesoflife.clienten.cases.Client;
 import nl.bytesoflife.clienten.data.*;
 
 import javax.persistence.*;
