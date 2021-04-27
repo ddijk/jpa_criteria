@@ -17,7 +17,7 @@ public class DeclaratieFromFileTest {
     @Test
     public void verifyPayableDeclarations() throws IOException {
 
-        FinancialOverview financialOverview = DeclarationsHelper.readFinancialOverviewFromFile("knook.json");
+        FinancialOverview financialOverview = DeclarationsHelper.readFinancialOverviewFromFile("declarations_2.json");
 
         final List<CompanyTransactions> companyTransactionsList = financialOverview.getCompanyTransactionsList();
         assertEquals(2, companyTransactionsList.size());
