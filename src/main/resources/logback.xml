@@ -33,8 +33,12 @@
 <!--        <appender-ref ref="STDOUT" />-->
 <!--    </logger>-->
     <!-- DEBUG for SQL query logging -->
-    <logger name="org.hibernate.SQL" level="ERROR" additivity="false">
+    <logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
 <!--        <appender-ref ref="FILE" />-->
+        <appender-ref ref="STDOUT" />
+    </logger>
+    <logger name="org.hibernate.type.descriptor.sql" level="trace" additivity="false">
+        <!--        <appender-ref ref="FILE" />-->
         <appender-ref ref="STDOUT" />
     </logger>
 

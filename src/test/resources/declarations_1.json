@@ -1,0 +1,49 @@
+{
+  "name": "R.P.J. Knook",
+  "projectReference": "_(1)_@_(2)_0800_(3)_@_(4)_ERKEND_///_(a)_@_(b)_@_(c)_@_(d)_MVDB//37_(e)_@_(f)_@",
+  "generatedAt": {
+    "date": "14 april 2021",
+    "time": "12:00"
+  },
+  "accountViewOffline": false,
+  "companyTransactionsList": [
+    {
+      "companyName": "VERKRUISEN",
+      "order": 2,
+      "derdengelden": [],
+
+      "declarations": [
+        {
+          "amount": 123.45,
+          "datum": "2019",
+          "invoice": "inv1"
+        },
+        {
+          "amount": 723.45,
+          "datum": "2020",
+          "invoice": "inv1"
+        },
+        {
+          "amount": 300.10,
+          "datum": "2020",
+          "invoice": "inv2"
+        }
+      ]
+    },
+    {
+      "companyName": "COLUMBUS",
+      "order": 3,
+      "derdengelden": [],
+      "declarations": [
+        {
+          "amount": 200.10,
+          "datum": "2021",
+          "invoice": "inv3"
+        }
+      ]
+    }
+  ],
+  "accountViewBalance": "18849.29",
+  "depotAmount": "0.00",
+  "debiteurBedragVerkruisenOud": null
+}
