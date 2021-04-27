@@ -2,6 +2,8 @@ package nl.dijkrosoft.depot;
 
 import nl.bytesoflife.clienten.service.accountview.finance.CompanyTransactions;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
@@ -13,7 +15,9 @@ public class DepotUtil {
 
     public static List<Declaration> flatMapToDeclarations(List<CompanyTransactions> companyTransactionsList) {
 
-        return companyTransactionsList.stream().flatMap(tx -> addCompany(tx)).collect(toList());
+        final List<Declaration> declarations = companyTransactionsList.stream().flatMap(tx -> addCompany(tx)).collect(toList());
+        Collections.sort(declarations, Comparator.comparing(d->d.getDatum()));
+        return declarations;
     }
 
     private static Stream<Declaration> addCompany(CompanyTransactions tx) {
@@ -32,15 +36,18 @@ public class DepotUtil {
 
             final double moneyLeft = container.getMoneyLeft();
             if ( Math.abs(moneyLeft) < 0.004) {
+                System.out.println("'t is op");
                 return container;
             } else {
                 if ( moneyLeft >= decl.getAmount() ) {
 
+                    System.out.println(String.format("If tak: MoneyLeft=%f  decl amount:%f", moneyLeft, decl.getAmount()));
                     // pay the whole declaration
                     container.getBetalingList().add(new DeclaratieBetaling(decl, true, decl.getAmount()));
                     container.setMoneyLeft(container.getMoneyLeft()-decl.getAmount());
                 } else {
 
+                    System.out.println(String.format("Else tak: MoneyLeft=%f  decl amount:%f", moneyLeft, decl.getAmount()));
                     // pay part of the declaration
                     container.getBetalingList().add(new DeclaratieBetaling(decl, false, moneyLeft));
                     container.setMoneyLeft(0.0d);

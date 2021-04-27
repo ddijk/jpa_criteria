@@ -24,7 +24,7 @@ public class DeclaratieBetaling {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DeclaratieBetaling that = (DeclaratieBetaling) o;
-        return fullyPaid == that.fullyPaid && Precision.equals(that.amountPaid, amountPaid) && declaration.equals(that.declaration);
+        return fullyPaid == that.fullyPaid && Precision.equals(that.amountPaid, amountPaid, 0.004) && declaration.equals(that.declaration);
     }
 
     @Override

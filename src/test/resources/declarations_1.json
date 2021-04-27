@@ -15,12 +15,12 @@
       "declarations": [
         {
           "amount": 123.45,
-          "datum": "2019",
+          "datum": "2018",
           "invoice": "inv1"
         },
         {
           "amount": 723.45,
-          "datum": "2020",
+          "datum": "2019",
           "invoice": "inv1"
         },
         {
