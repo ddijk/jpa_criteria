@@ -161,7 +161,7 @@ public class Runner2 {
 
         List<CaseListItem> caseList =  result.stream().map(t -> convert(t)).collect(Collectors.toList());
         String filters = "{blah}";
-        return new CasesResponse(new Zaken<>(0, 1, 5, caseList), filters);
+        return new CasesResponse(new Zaken<>(0, 1, 5, caseList), filters, null);
 
     }
 

@@ -1,6 +1,5 @@
 package nl.dijkrosoft;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.bytesoflife.clienten.CasesResponse;
 import nl.bytesoflife.clienten.Zaken;
 import nl.bytesoflife.clienten.cases.*;
@@ -9,39 +8,53 @@ import nl.bytesoflife.clienten.finance.praktijk.PageHelper;
 
 import javax.persistence.*;
 import javax.persistence.criteria.*;
-import java.io.BufferedWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static nl.bytesoflife.clienten.data.Filters.createPraktijkenFilter;
+import static nl.dijkrosoft.JPARunner.authPraktijken;
+import static nl.dijkrosoft.JPARunner.selectedPraktijken;
+import static nl.dijkrosoft.JPQL_Runner.archivedOnly;
 
 public class Runner4 {
     private static String filters = "{ folderId:[1313], name: \"\"}";
     private static int page = 0;
+
     public static void main(String[] args) {
         EntityManagerFactory emf = null;
         EntityManager em = null;
-        try ( BufferedWriter bufferedWriter = Files.newBufferedWriter(Paths.get("/Users/dickdijk/Advobot/Advobot/real_9898.json"))) {
+
+        try {
 
             emf = Persistence.createEntityManagerFactory("myPU2");
             em = emf.createEntityManager();
 
-            CasesResponse cr = runQuery(em);
-//            long caseId = 36;
-//            getOtherCaseContactDetails(caseId, em);
-            ObjectMapper om = new ObjectMapper();
-            om.writerWithDefaultPrettyPrinter().writeValue(bufferedWriter, cr);
+            Filters filterz = Filters.create(filters);
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            final CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+
+            final Root<Case> caseRoot = countQuery.from(Case.class);
+            Predicate praktijkenFilter = createPraktijkenFilter(cb, caseRoot.get(Case_.folder).get(Folder_.id), selectedPraktijken, authPraktijken);
+
+            if (filterz.getIsArchived() != null && (boolean) filterz.getIsArchived()) {
+                countQuery.where(cb.and(praktijkenFilter, archivedOnly(cb, caseRoot)));
+            } else {
+                countQuery.where(cb.and(praktijkenFilter, archivedOnly(cb, caseRoot).not()));
+            }
+
+            countQuery.select(cb.count(caseRoot));
+
+            long totalElements = em.createQuery(countQuery).getSingleResult();
+
+//            caseRoot.join("accountviewProject");
 
 
-        } catch (Exception ex ) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
-            if (em != null)
-            {
+            if (em != null) {
                 em.close();
             }
             if (emf != null) emf.close();
@@ -71,7 +84,7 @@ public class Runner4 {
         int calculatedPageNr = PageHelper.calculatePageIndex(page, totalElements, pageSize);
         long numPages = PageHelper.calculateNumberOfPages(totalElements, pageSize);
         if (calculatedPageNr == -1) {
-            return new CasesResponse(new Zaken(numPages - 1, numPages, totalElements, Collections.emptyList()), filters);
+            return new CasesResponse(new Zaken(numPages - 1, numPages, totalElements, Collections.emptyList()), filters, null);
         }
 
         final CriteriaQuery<Tuple> tupleQuery = cb.createTupleQuery();
@@ -83,7 +96,7 @@ public class Runner4 {
 
         Join<Case, ClientContactDetails> contactClientJoin = root.join(Case_.contactClient, JoinType.LEFT);
 
-        Join<Case,CaseArchiveCheck> archiveCheckJoin = root.join(Case_.caseArchiveCheck, JoinType.LEFT);
+        Join<Case, CaseArchiveCheck> archiveCheckJoin = root.join(Case_.caseArchiveCheck, JoinType.LEFT);
         tupleQuery.multiselect(
                 root.get(Case_.id).alias("id"),
                 root.get(Case_.name).alias("name"),
@@ -164,23 +177,26 @@ public class Runner4 {
         for (Tuple t : result) {
             //System.out.println(String.format("case id: '%d', dossiernummer:'%s' telefoon: '%s', email: '%s'",t.get("id"),t.get("dossiernummer"),t.get("mainContactTelefoon"),t.get("mainContactEmail")));
             final Long id = t.get("id", Long.class);
-            System.out.println("****** id "+id);
+            System.out.println("****** id " + id);
             System.out.println(String.format("case id: '%d', dossiernummer:'%s' ", id, t.get("dossiernummer")));
             List<Contact> mainCaseEmailAddresses = getMainCaseList(em, id, ClientContactDetails::getEmail);
-            System.out.println("mainCaseEmailAddresses:"+ mainCaseEmailAddresses);
+            System.out.println("mainCaseEmailAddresses:" + mainCaseEmailAddresses);
             List<Contact> mainCaseTelefoonNrs = getMainCaseList(em, id, ClientContactDetails::getTelefoon);
-            System.out.println("mainCaseTelefoonNrs:"+ mainCaseTelefoonNrs);
+            System.out.println("mainCaseTelefoonNrs:" + mainCaseTelefoonNrs);
             final Long contactClientId = t.get("contactClientId", Long.class);
 
             List<Contact> contactCaseEmailAddresses = getContactCaseList(em, id, ClientContactDetails::getEmail);
 
-            System.out.println("Contact case: Email addresses: "+ contactCaseEmailAddresses);
+            System.out.println("Contact case: Email addresses: " + contactCaseEmailAddresses);
 
-            OtherCaseContactDetails otherCaseContactDetails = getOtherCaseContactDetails(id, em );
+            OtherCaseContactDetails otherCaseContactDetails = getOtherCaseContactDetails(id, em);
 
             List<OtherCaseContactDetails> otherCaseContactDetailsList = new ArrayList<>();
             otherCaseContactDetailsList.add(otherCaseContactDetails);
-            CaseListItem item = new CaseListItem(t.get("name", String.class),
+            //  public CaseListItem(Long id, String name, String dossiernummer, Long leadnummer, String bijzondereStatus, String datumToedracht, CaseFolder folder, MainCaseContactDetails mainCaseContactDetails, ContactCaseContactDetails contactCaseContactDetails, List<OtherCaseContactDetails> otherCaseContactDetails, LocalDate lastPaymentDate, Double saldo, Double saldoAV, Long unreadCount) {
+            //
+            CaseListItem item = new CaseListItem(1L,
+                    t.get("name", String.class),
                     t.get("dossiernummer", String.class),
                     t.get("leadnummer", Long.class),
                     t.get("bijzondereStatus", String.class),
@@ -198,9 +214,11 @@ public class Runner4 {
                             t.get("woonplaats", String.class)),
                     new ContactCaseContactDetails(contactCaseEmailAddresses),
                     otherCaseContactDetailsList,
+
                     t.get("lastPaymentDate", LocalDate.class),
                     t.get("saldo", Double.class),
-                    t.get("saldoAV", Double.class)
+                    t.get("saldoAV", Double.class),
+                    0L
             );
             final Boolean blok = t.get("blok", Boolean.class);
             if (blok != null) {
@@ -218,20 +236,20 @@ public class Runner4 {
 
         }
 
-        return new CasesResponse(new Zaken<>(calculatedPageNr, numPages, totalElements, caseList), filters);
+        return new CasesResponse(new Zaken<>(calculatedPageNr, numPages, totalElements, caseList), filters, null);
 
     }
 
     private static OtherCaseContactDetails getOtherCaseContactDetails(Long caseId, EntityManager em) {
 
 
-        final TypedQuery<ClientContactDetails> query = em.createQuery("Select c from ClientContactDetails  c where c.otherCase.id=?1 and c.typeDerde='Wederpartij'" , ClientContactDetails.class);
+        final TypedQuery<ClientContactDetails> query = em.createQuery("Select c from ClientContactDetails  c where c.otherCase.id=?1 and c.typeDerde='Wederpartij'", ClientContactDetails.class);
         query.setParameter(1, caseId);
 
         List<Contact> emailLijst = new ArrayList<>();
         List<Contact> telefoonLijst = new ArrayList<>();
         final List<ClientContactDetails> resultList = query.getResultList();
-        if ( resultList.size() > 0) {
+        if (resultList.size() > 0) {
 
             final ClientContactDetails ccd = resultList.get(0);
             System.out.println("here we go getOtherCaseList:" + ccd);
@@ -239,7 +257,7 @@ public class Runner4 {
             telefoonLijst.addAll(ccd.getTelefoon().stream().map(e -> new Contact(e.getValue(), e.getIsDefault())).collect(Collectors.toList()));
 
             return new OtherCaseContactDetails(ccd.getNaam(), ccd.getDefaultContact(), emailLijst, ccd.getInstantie(),
-                    ccd.getPostbus(), ccd.getPostcodePostbus(), ccd.getPlaatsnaamPostbus(), telefoonLijst, ccd.getTypeDerde() );
+                    ccd.getPostbus(), ccd.getPostcodePostbus(), ccd.getPlaatsnaamPostbus(), telefoonLijst, ccd.getTypeDerde());
         } else {
             return null;
         }
@@ -260,7 +278,7 @@ public class Runner4 {
     }
 
     private static List<Contact> getMainCaseList(EntityManager em, Long caseId, Function<ClientContactDetails, List<ClientContactValueWithType>> valueRetriever) {
-        final TypedQuery<ClientContactDetails> query = em.createQuery("Select c from ClientContactDetails  c where c.mainCase.id=?1" , ClientContactDetails.class);
+        final TypedQuery<ClientContactDetails> query = em.createQuery("Select c from ClientContactDetails  c where c.mainCase.id=?1", ClientContactDetails.class);
         query.setParameter(1, caseId);
 
         List<Contact> result = new ArrayList<>();
@@ -272,7 +290,7 @@ public class Runner4 {
     }
 
     private static List<Contact> getOtherCaseList(EntityManager em, Long caseId, Function<ClientContactDetails, List<ClientContactValueWithType>> valueRetriever) {
-        final TypedQuery<ClientContactDetails> query = em.createQuery("Select c from ClientContactDetails  c where c.otherCase.id=?1 and c.typeDerde='Wederpartij'" , ClientContactDetails.class);
+        final TypedQuery<ClientContactDetails> query = em.createQuery("Select c from ClientContactDetails  c where c.otherCase.id=?1 and c.typeDerde='Wederpartij'", ClientContactDetails.class);
         query.setParameter(1, caseId);
 
         List<Contact> result = new ArrayList<>();
