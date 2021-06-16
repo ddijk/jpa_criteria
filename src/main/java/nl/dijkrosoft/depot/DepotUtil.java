@@ -16,7 +16,7 @@ public class DepotUtil {
     public static List<Declaration> flatMapToDeclarations(List<CompanyTransactions> companyTransactionsList) {
 
         final List<Declaration> declarations = companyTransactionsList.stream().flatMap(tx -> addCompany(tx)).collect(toList());
-        Collections.sort(declarations, Comparator.comparing(d->d.getDatum()));
+        Collections.sort(declarations, Comparator.comparing(d->d.getDatum())); // sort on oldest first (asc)
         return declarations;
     }
 

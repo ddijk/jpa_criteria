@@ -25,7 +25,6 @@ public class DeclaratieFromFileTest {
         // add company to declaration:
         List<Declaration> declarations = DepotUtil.flatMapToDeclarations(companyTransactionsList);
 
-        Collections.sort(declarations, Comparator.comparing(d->d.getDatum()));
         assertEquals(15, declarations.size());
 
 

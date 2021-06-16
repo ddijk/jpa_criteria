@@ -1,18 +1,25 @@
-package nl.dijkrosoft;
+package nl.dijkrosoft.derdengelden;
 
-
+import nl.bytesoflife.clienten.data.Case;
+import nl.bytesoflife.clienten.data.Case_;
 import nl.bytesoflife.clienten.service.accountview.finance.FinancialData;
 import nl.bytesoflife.clienten.service.accountview.finance.FinancialData_;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.util.List;
 
-public class FindDerdengeldenRunner {
+import static nl.bytesoflife.clienten.data.Filters.createPraktijkenFilter;
+import static nl.dijkrosoft.JPARunner.authPraktijken;
+import static nl.dijkrosoft.JPARunner.selectedPraktijken;
+
+public class DerdengeldenDateRunner {
+
     public static void main(String[] args) {
         EntityManagerFactory emf = null;
         EntityManager em = null;
@@ -21,26 +28,13 @@ public class FindDerdengeldenRunner {
             emf = Persistence.createEntityManagerFactory("myPU2");
             em = emf.createEntityManager();
 
-            CriteriaBuilder cb = em.getCriteriaBuilder();
 
-            final CriteriaQuery<String> projCodeQuery = cb.createQuery(String.class);
+            final Query query = em.createQuery("select fd from FinancialData fd");
+         for (Object o :   query.getResultList()) {
 
-            final Root<FinancialData> fdRoot = projCodeQuery.from(FinancialData.class);
-
-
-            projCodeQuery.where(cb.gt(cb.abs(fdRoot.get(FinancialData_.derdengeldenSaldo)), 0.004d));
-
-            projCodeQuery.select(fdRoot.get(FinancialData_.projectCode));
-
-            final List<String> resultList = em.createQuery(projCodeQuery).getResultList();
-
-
-            System.out.println("total:"+resultList);
-            for ( String projCode : resultList) {
-                System.out.println(projCode);
-            }
-
-
+             FinancialData f = (FinancialData) o;
+             System.out.println(String.format("'%s en first date is '%s'", f.getProjectCode(), f.getDerdengeldenFirstTxDate()));
+         }
 
         } finally {
             if (em != null)
@@ -49,5 +43,6 @@ public class FindDerdengeldenRunner {
             }
             if (emf != null) emf.close();
         }
+
     }
 }

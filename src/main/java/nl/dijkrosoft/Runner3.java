@@ -1,20 +1,11 @@
 package nl.dijkrosoft;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import nl.bytesoflife.clienten.CasesResponse;
-import nl.bytesoflife.clienten.Zaken;
-import nl.bytesoflife.clienten.cases.*;
-import nl.bytesoflife.clienten.data.*;
 
-import javax.persistence.*;
-import javax.persistence.criteria.*;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.criteria.CriteriaBuilder;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
-import static nl.dijkrosoft.JPARunner.*;
 
 public class Runner3 {
 
@@ -30,7 +21,7 @@ public class Runner3 {
             CriteriaBuilder cb = em.getCriteriaBuilder();
 //            CasesResponse cr = testCaseListRefactoring(em, cb);
 
-            ObjectMapper om = new ObjectMapper();
+//            ObjectMapper om = new ObjectMapper();
 //            om.writerWithDefaultPrettyPrinter().writeValue(System.out, cr);
 
         } catch (Exception ex) {

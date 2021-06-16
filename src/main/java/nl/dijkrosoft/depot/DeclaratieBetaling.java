@@ -2,7 +2,6 @@ package nl.dijkrosoft.depot;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.apache.commons.math3.util.Precision;
 

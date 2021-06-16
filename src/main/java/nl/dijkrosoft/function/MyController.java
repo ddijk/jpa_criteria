@@ -1,22 +1,15 @@
 package nl.dijkrosoft.function;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import nl.bytesoflife.clienten.CasesResponse;
-import nl.bytesoflife.clienten.data.*;
+import nl.bytesoflife.clienten.data.ClientContactDetails;
+import nl.bytesoflife.clienten.data.ClientContactDetails_;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.persistence.criteria.*;
-import java.io.BufferedWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.List;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.Set;
-
-import static nl.dijkrosoft.function.Helper.findCaseByPostCode;
-import static nl.dijkrosoft.function.Helper.findCases;
 
 public class MyController {
 

@@ -11,8 +11,6 @@
       "declarations": [
         {
           "amount": 1096.56,
-          "dagboek": "DEB/248",
-          "description": "j",
           "periode": 7,
           "period": 7,
           "datum": "2018-07-05T00:00:00",
@@ -21,8 +19,6 @@
         },
         {
           "amount": 1657.67,
-          "dagboek": "DEB/7",
-          "description": "j",
           "periode": 1,
           "period": 1,
           "datum": "2018-01-16T00:00:00",
@@ -31,8 +27,6 @@
         },
         {
           "amount": -489.38,
-          "dagboek": "R09/5",
-          "description": "Allianz",
           "periode": 1,
           "period": 1,
           "datum": "2018-01-31T00:00:00",
@@ -41,8 +35,6 @@
         },
         {
           "amount": 1883.77,
-          "dagboek": "DEB/319",
-          "description": "o",
           "periode": 10,
           "period": 10,
           "datum": "2017-10-04T00:00:00",
@@ -51,8 +43,6 @@
         },
         {
           "amount": 1975.62,
-          "dagboek": "DEB/139",
-          "description": "m",
           "periode": 4,
           "period": 4,
           "datum": "2017-04-10T00:00:00",
@@ -61,8 +51,6 @@
         },
         {
           "amount": 5654.29,
-          "dagboek": "DEB/125",
-          "description": "m",
           "periode": 4,
           "period": 4,
           "datum": "2018-04-09T00:00:00",
@@ -71,8 +59,6 @@
         },
         {
           "amount": 1524.41,
-          "dagboek": "DEB/202",
-          "description": "j",
           "periode": 6,
           "period": 6,
           "datum": "2017-06-29T00:00:00",
@@ -81,8 +67,6 @@
         },
         {
           "amount": 246.91,
-          "dagboek": "DEB/37",
-          "description": "j",
           "periode": 1,
           "period": 1,
           "datum": "2019-01-15T00:00:00",
@@ -91,8 +75,6 @@
         },
         {
           "amount": 282.17,
-          "dagboek": "DEB/522",
-          "description": "Declaratie",
           "periode": 10,
           "period": 10,
           "datum": "2019-10-07T00:00:00",
@@ -101,8 +83,6 @@
         },
         {
           "amount": 3609.75,
-          "dagboek": "DEB/24",
-          "description": "j",
           "periode": 1,
           "period": 1,
           "datum": "2017-01-18T00:00:00",
@@ -111,8 +91,6 @@
         },
         {
           "amount": -3500.0,
-          "dagboek": "R09/45",
-          "description": "Allianz",
           "periode": 7,
           "period": 7,
           "datum": "2018-07-06T00:00:00",
@@ -121,8 +99,6 @@
         },
         {
           "amount": 3990.44,
-          "dagboek": "DEB/349",
-          "description": "o",
           "periode": 10,
           "period": 10,
           "datum": "2018-10-15T00:00:00",
@@ -138,8 +114,6 @@
       "declarations": [
         {
           "amount": 388.0,
-          "dagboek": "DEB/3233",
-          "description": "Declaratie",
           "periode": 9,
           "period": 9,
           "datum": "2020-09-03T00:00:00",
@@ -148,8 +122,6 @@
         },
         {
           "amount": 529.08,
-          "dagboek": "DEB/1966",
-          "description": "Declaratie",
           "periode": 6,
           "period": 6,
           "datum": "2020-06-04T00:00:00",
@@ -158,8 +130,6 @@
         },
         {
           "amount": 0.0,
-          "dagboek": "DEB/4400",
-          "description": "Declaratie",
           "periode": 11,
           "period": 11,
           "datum": "2020-11-26T00:00:00",

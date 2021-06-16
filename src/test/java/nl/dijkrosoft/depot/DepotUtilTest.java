@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static nl.bytesoflife.clienten.Constants.COLUMBUS;
