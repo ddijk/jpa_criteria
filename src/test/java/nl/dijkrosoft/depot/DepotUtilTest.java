@@ -20,6 +20,7 @@ public class DepotUtilTest {
         FinancialOverview financialOverview = DeclarationsHelper.readFinancialOverviewFromFile("declarations_1.json");
 
 
+        System.out.println("jajaj jdfasfads");
         final List<Declaration> actualDeclarations = DepotUtil.flatMapToDeclarations(financialOverview.getCompanyTransactionsList());
 
         final List<Declaration> expectedDeclarations = new ArrayList<>();
@@ -67,5 +68,6 @@ public class DepotUtilTest {
 
         assertThat(actualDeclaratieBetalingen).hasSameElementsAs(expectedDeclaratieBetalingen);
     }
+
 
 }

@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class JPARunner {
     public static List<Integer> selectedPraktijken = Arrays.asList(1313, 1, 43);
-    public static final List<Long> authPraktijken = Arrays.asList(1313L);
+    public static final List<Long> authPraktijken = Arrays.asList(1313L, 1L);
 
     public static void main(String[] args) {
         EntityManagerFactory emf = null;

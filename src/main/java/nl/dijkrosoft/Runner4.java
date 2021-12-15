@@ -201,7 +201,7 @@ public class Runner4 {
                     t.get("leadnummer", Long.class),
                     t.get("bijzondereStatus", String.class),
                     t.get("datumToedracht", String.class),
-                    new CaseFolder(t.get("folderName", String.class)),
+                    new CaseFolder(t.get("folderName", String.class), "dummy"),
                     new MainCaseContactDetails(t.get("defaultContact", DefaultContact.class),
                             t.get("geslacht", Geslacht.class),
                             t.get("mainContactNaam", String.class),
@@ -222,7 +222,7 @@ public class Runner4 {
             );
             final Boolean blok = t.get("blok", Boolean.class);
             if (blok != null) {
-                item.setAccountviewProject(new Project(blok));
+                item.setAccountviewProject(new Project(blok, "type", "ref"));
             }
             final Date praktijkhoofdCheckedDate = t.get("praktijkhoofdCheckedDate", Date.class);
             final Boolean needsPraktijkhoofdChecked = t.get("needsPraktijkhoofdChecked", Boolean.class);
@@ -257,7 +257,7 @@ public class Runner4 {
             telefoonLijst.addAll(ccd.getTelefoon().stream().map(e -> new Contact(e.getValue(), e.getIsDefault())).collect(Collectors.toList()));
 
             return new OtherCaseContactDetails(ccd.getNaam(), ccd.getDefaultContact(), emailLijst, ccd.getInstantie(),
-                    ccd.getPostbus(), ccd.getPostcodePostbus(), ccd.getPlaatsnaamPostbus(), telefoonLijst, ccd.getTypeDerde());
+                    ccd.getPostbus(), ccd.getPostcodePostbus(), ccd.getPlaatsnaamPostbus(), telefoonLijst, ccd.getTypeDerde(), "ref");
         } else {
             return null;
         }
