@@ -22,15 +22,12 @@ public class ErkendStandaardFilter {
 
             final Join<Case, AccountviewProject> accountviewProjectJoin = caseRoot.join(Case_.accountviewProject);
 
-            ParameterExpression<String> erkendExpression = cb.parameter(String.class);
-//            caseQuery.where(cb.isNotNull(cb.function("REGEXP_MATCHES", String.class,accountviewProjectJoin.get(AccountviewProject_.REFE),  erkendExpression )));
-//            EscapingLikeExpression escapingLikeExpression = new EscapingLikeExpression(accountviewProjectJoin.get(AccountviewProject_.REFE).toString(), "%_ERKEND_%");
-//            caseQuery.where(cb.like( escapingLikeExpression));
 
-//            caseQuery.where(caseRoot.get(Case_.id).in(36, 2911,52,43));
-//            caseQuery.where(accountviewProjectJoin.get(AccountviewProject_.REFE).in("_(1)_@_(2)_LC_(3)_GCS_(4)_ERKEND_///_(a)_080_(b)_@_(c)_@_(d)_@_(e)_@_(f)_@"));
-
-            caseQuery.where(cb.like(accountviewProjectJoin.get(AccountviewProject_.REFE),"%\\_ERKEND\\_%", '\\' ));
+//            caseQuery.where(cb.like(accountviewProjectJoin.get(AccountviewProject_.REFE),"%\\_ERKEND\\_%", '\\' ));
+            caseQuery.where(cb.and(
+                    cb.equal(accountviewProjectJoin.get(AccountviewProject_.TYPE), cb.literal("BET STD")),
+                    cb.like(accountviewProjectJoin.get(AccountviewProject_.REFE),"%\\_ERKEND\\_%", '\\' )
+            ));
             caseQuery.multiselect(
                     caseRoot.get(Case_.id).alias("id"),
                     accountviewProjectJoin.get(AccountviewProject_.REFE).alias("ref"),
