@@ -19,17 +19,15 @@ public class RunnerBgkNativeSQL {
 
 
             long caseId = 63746L;
-            final Query nativeQuery = em.createNativeQuery("select nu,potentieel,posting_date from hoofdsom_invoer where \"case\"=?1 order by posting_date desc limit 1");
+            final Query nativeQuery = em.createNamedQuery("GetLatestHoofdsomInvoer");
             nativeQuery.setParameter(1, caseId);
 
-            final List<Object[]> resultList = nativeQuery.getResultList();
+            final List<HoofdsomInvoer2> resultList = nativeQuery.getResultList();
             System.out.println("Aantal results is " + resultList.size());
-            for (Object[]  hoofdsomInvoer : resultList) {
+            for (HoofdsomInvoer2  hoofdsomInvoer : resultList) {
 
-                for ( Object o : hoofdsomInvoer) {
 
-                    System.out.println(o);
-                }
+                    System.out.println(hoofdsomInvoer);
             }
 
 

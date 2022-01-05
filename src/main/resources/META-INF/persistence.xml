@@ -58,6 +58,7 @@
         <class>nl.bytesoflife.clienten.taskplanner.data.Job</class>
         <class>nl.bytesoflife.clienten.taskplanner.data.JobType</class>
         <class>nl.bytesoflife.clienten.hoofdsom.HoofdsomInvoer</class>
+        <class>nl.dijkrosoft.bgk_overzicht.HoofdsomInvoer2</class>
         <properties>
             <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/advobot_test"/>
             <property name="javax.persistence.jdbc.password" value="advobot_test"/>
