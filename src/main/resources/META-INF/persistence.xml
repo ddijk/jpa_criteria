@@ -16,6 +16,8 @@
         <class>nl.bytesoflife.clienten.data.Case</class>
         <class>nl.bytesoflife.clienten.data.Rappel</class>
         <class>nl.bytesoflife.clienten.data.TaskDetails</class>
+        <class>nl.bytesoflife.clienten.data.TaskDescription</class>
+        <class>nl.bytesoflife.clienten.data.TaskType</class>
         <class>nl.bytesoflife.clienten.data.Werkcode</class>
         <class>nl.bytesoflife.clienten.data.ClientContactDetails</class>
         <class>nl.bytesoflife.clienten.data.AppUser</class>

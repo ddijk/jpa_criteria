@@ -32,7 +32,7 @@
         <dependency>
             <groupId>nl.bytesoflife.verkruisen</groupId>
             <artifactId>backend</artifactId>
-            <version>1.1.256</version>
+            <version>1.1.259</version>
 <!--            <classifier>original</classifier>-->
         </dependency>
 

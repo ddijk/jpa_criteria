@@ -218,7 +218,7 @@ public class Runner4 {
                     t.get("lastPaymentDate", LocalDate.class),
                     t.get("saldo", Double.class),
                     t.get("saldoAV", Double.class),
-                    0L
+                    new Date(), 0L
             );
             final Boolean blok = t.get("blok", Boolean.class);
             if (blok != null) {

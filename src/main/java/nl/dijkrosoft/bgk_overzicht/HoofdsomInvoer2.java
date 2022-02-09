@@ -20,11 +20,10 @@ import java.time.LocalDateTime;
                 @ConstructorResult(
                         targetClass=nl.dijkrosoft.bgk_overzicht.HoofdsomInvoer2.class,
                         columns={
-                                @ColumnResult(name="id", type=Integer.class),
                                 @ColumnResult(name="nu", type=Float.class),
                                 @ColumnResult(name="potentieel", type=Float.class),
                                 @ColumnResult(name="posting_date", type=LocalDateTime.class)})})
-@NamedNativeQuery(name="GetLatestHoofdsomInvoer", query="select id, nu,potentieel,posting_date from hoofdsom_invoer where \"case\"=?1 order by posting_date desc limit 1", resultSetMapping = "HoofdinvoerResult")
+//@NamedNativeQuery(name="GetLatestHoofdsomInvoer", query="select nu,potentieel,posting_date from hoofdsom_invoer where \"case\"=?1 order by posting_date desc limit 1", resultSetMapping = "HoofdinvoerResult")
 public class HoofdsomInvoer2 {
 
     @Id
@@ -57,8 +56,7 @@ public class HoofdsomInvoer2 {
         this.zaak = zaak;
     }
 
-    public HoofdsomInvoer2(int id, float nu, float potentieel, LocalDateTime timestamp) {
-        this.id = id;
+    public HoofdsomInvoer2(float nu, float potentieel, LocalDateTime timestamp) {
         this.timestamp = timestamp;
         this.nu = nu;
         this.potentieel = potentieel;

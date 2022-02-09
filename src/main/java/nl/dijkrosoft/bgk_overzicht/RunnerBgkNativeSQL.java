@@ -22,13 +22,19 @@ public class RunnerBgkNativeSQL {
             final Query nativeQuery = em.createNamedQuery("GetLatestHoofdsomInvoer");
             nativeQuery.setParameter(1, caseId);
 
-            final List<HoofdsomInvoer2> resultList = nativeQuery.getResultList();
-            System.out.println("Aantal results is " + resultList.size());
-            for (HoofdsomInvoer2  hoofdsomInvoer : resultList) {
+            final HoofdsomInvoer2 resultList = (HoofdsomInvoer2) nativeQuery.getSingleResult();
 
-
-                    System.out.println(hoofdsomInvoer);
+            if ( resultList==null) {
+                System.out.println("leeg");
+            } else {
+                System.out.println(resultList);
             }
+//            System.out.println("Aantal results is " + resultList.size());
+//            for (HoofdsomInvoer2  hoofdsomInvoer : resultList) {
+//
+//
+//                    System.out.println(hoofdsomInvoer);
+//            }
 
 
         } catch (Exception ex) {
