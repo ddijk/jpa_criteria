@@ -41,7 +41,7 @@ public class ArchiveCheckRunner {
                 System.out.println("caseArchiveCheck=" + t.get("check", Long.class));
             }
 
-            System.out.println("Aantal is " + resultList.get(0));
+            System.out.println("Aantal is " + resultList.size());
 
             System.out.println("Update done");
 
